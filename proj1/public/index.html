@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowRev — Pipeline Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0c0b;
+      --surface: #161615;
+      --surface2: #1f1f1d;
+      --surface-raised: #252523;
+      --border: #2e2e2b;
+      --border-strong: #3d3d39;
+      --text: #ecece8;
+      --text-secondary: #b8b8b2;
+      --muted: #7a7a74;
+      --accent: #5c7a9e;
+      --accent-hover: #6d8db3;
+      --accent-muted: rgba(92, 122, 158, 0.12);
+      --green: #6b9e7a;
+      --green-muted: rgba(107, 158, 122, 0.1);
+      --red: #b86b6b;
+      --red-muted: rgba(184, 107, 107, 0.1);
+      --amber: #a68b4a;
+      --amber-muted: rgba(166, 139, 74, 0.1);
+      --highlight: #8a9aaa;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.18);
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-snap: cubic-bezier(0.34, 1.2, 0.64, 1);
+      --duration-fast: 180ms;
+      --duration-reveal: 260ms;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(92, 122, 158, 0.04), transparent),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 40%);
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 0.35rem;
+      letter-spacing: 0.01em;
+    }
+
+    .rule {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--red-muted);
+      border: 1px solid rgba(184, 107, 107, 0.28);
+      border-left: 3px solid var(--red);
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: #d4a0a0;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    select, button {
+      font: inherit;
+      border-radius: 4px;
+      border: 1px solid var(--border-strong);
+      padding: 0.5rem 0.85rem;
+      background: var(--surface2);
+      color: var(--text);
+      transition:
+        background var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        transform var(--duration-fast) var(--ease-snap);
+    }
+
+    select {
+      min-width: 260px;
+      cursor: pointer;
+    }
+
+    select:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-raised);
+    }
+
+    select:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-muted);
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent-muted), 0 0 0 1px var(--accent);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #f4f6f8;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button.primary:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    button.primary.loading {
+      padding-left: 2.4rem;
+    }
+
+    button.primary.loading::before {
+      content: "";
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      margin-top: -6px;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.78rem;
+    }
+
+    .flow-node {
+      padding: 0.4rem 0.65rem;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition:
+        border-color var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        background var(--duration-fast) var(--ease-out),
+        transform var(--duration-fast) var(--ease-snap);
+    }
+
+    .flow-node.active {
+      border-color: var(--highlight);
+      color: var(--text);
+      background: var(--surface2);
+      border-left: 2px solid var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .flow-node.done {
+      border-color: rgba(107, 158, 122, 0.45);
+      color: var(--green);
+      background: var(--green-muted);
+    }
+
+    .flow-arrow {
+      color: var(--border-strong);
+      padding: 0 0.15rem;
+      user-select: none;
+    }
+
+    .trust-banner {
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      background: var(--green-muted);
+      border: 1px solid rgba(107, 158, 122, 0.3);
+      border-left: 3px solid var(--green);
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      display: none;
+      animation: fadeInUp var(--duration-reveal) var(--ease-out) both;
+    }
+
+    .trust-banner.visible { display: block; }
+
+    .stages { display: flex; flex-direction: column; gap: 1rem; }
+
+    .stage {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      opacity: 0.35;
+      transform: translateY(8px);
+      transition:
+        opacity var(--duration-reveal) var(--ease-out),
+        transform var(--duration-reveal) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stage.reveal-on-scroll:not(.is-revealed) {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .stage.visible,
+    .stage.reveal-on-scroll.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: var(--border);
+    }
+
+    .stage.active {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stage-header {
+      padding: 0.85rem 1rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stage-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+    }
+
+    .stage-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.complete {
+      background: var(--green-muted);
+      color: var(--green);
+      border: 1px solid rgba(107, 158, 122, 0.25);
+    }
+
+    .stage-body { padding: 1rem; font-size: 0.85rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      transition: background var(--duration-fast) var(--ease-out);
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-approved { color: var(--green); font-weight: 600; }
+    .status-rejected { color: var(--red); font-weight: 600; }
+    .status-escalated { color: var(--amber); font-weight: 600; }
+
+    .cpa-good { color: var(--green); }
+    .cpa-bad { color: var(--red); }
+    .cpa-mid { color: var(--amber); }
+
+    .json-block {
+      background: #0a0a09;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.75rem;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.72rem;
+      overflow-x: auto;
+      max-height: 200px;
+      color: var(--text-secondary);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 700px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel-title {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .exec-card,
+    .block-card,
+    .review-card,
+    .cap-item {
+      transition:
+        transform var(--duration-fast) var(--ease-snap),
+        box-shadow var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .exec-card:hover,
+    .block-card:hover,
+    .review-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .exec-card {
+      padding: 0.65rem 0.85rem;
+      background: var(--green-muted);
+      border: 1px solid rgba(107, 158, 122, 0.22);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .block-card {
+      padding: 0.65rem 0.85rem;
+      background: var(--red-muted);
+      border: 1px solid rgba(184, 107, 107, 0.22);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .caps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .cap-item {
+      padding: 0.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+
+    .cap-item:hover {
+      border-color: var(--border-strong);
+    }
+
+    .cap-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .error {
+      padding: 1rem;
+      background: var(--red-muted);
+      border: 1px solid rgba(184, 107, 107, 0.35);
+      border-left: 3px solid var(--red);
+      border-radius: 4px;
+      color: #d4a0a0;
+      margin-bottom: 1rem;
+      display: none;
+      animation: fadeInUp var(--duration-reveal) var(--ease-out) both;
+    }
+
+    .error.visible { display: block; }
+
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .flow-node.human { border-style: dashed; }
+
+    .review-panel {
+      background: var(--surface);
+      border: 1px solid rgba(166, 139, 74, 0.4);
+      border-left: 3px solid var(--amber);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+      display: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .review-panel.visible {
+      display: block;
+      animation: fadeInUp var(--duration-reveal) var(--ease-out) both;
+    }
+
+    .review-panel h3 {
+      font-size: 0.95rem;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .review-card {
+      padding: 0.85rem 1rem;
+      background: var(--amber-muted);
+      border: 1px solid rgba(166, 139, 74, 0.3);
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .review-card.resolved-approved {
+      border-color: rgba(107, 158, 122, 0.35);
+      background: var(--green-muted);
+    }
+
+    .review-card.resolved-rejected {
+      border-color: rgba(184, 107, 107, 0.3);
+      background: var(--red-muted);
+      opacity: 0.85;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+
+    button.approve {
+      background: var(--green);
+      border-color: var(--green);
+      color: #f4f6f4;
+      font-weight: 600;
+    }
+
+    button.approve:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    button.reject {
+      background: transparent;
+      border-color: var(--red);
+      color: #d4a0a0;
+    }
+
+    button.reject:hover:not(:disabled) {
+      background: var(--red-muted);
+      transform: translateY(-1px);
+    }
+
+    button.approve:disabled, button.reject:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .review-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+    .editable-table input, .editable-table select {
+      width: 100%;
+      font: inherit;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.4rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .editable-table input:focus, .editable-table select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-muted);
+    }
+
+    .editable-table .col-override { width: 88px; text-align: center; }
+
+    button.row-apply {
+      font-size: 0.72rem;
+      padding: 0.28rem 0.5rem;
+      border-radius: 3px;
+      border: 1px solid var(--accent);
+      background: var(--accent-muted);
+      color: #a8bdd4;
+      white-space: nowrap;
+    }
+
+    button.row-apply:hover {
+      background: rgba(92, 122, 158, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .table-apply-bar {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .table-apply-bar span {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    button.override-btn {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #f4f6f8;
+      font-weight: 600;
+    }
+
+    button.override-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .badge.overridden {
+      background: var(--accent-muted);
+      color: #a8bdd4;
+      border: 1px solid rgba(92, 122, 158, 0.3);
+    }
+
+    .decision-record-panel { margin-top: 1.25rem; }
+
+    .decision-record-panel .stage-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .outcome-approved { color: var(--green); font-weight: 600; }
+    .outcome-rejected { color: var(--red); font-weight: 600; }
+    .outcome-pending { color: var(--amber); font-weight: 600; }
+
+    tr.row-approved { background: var(--green-muted); }
+    tr.row-rejected { background: var(--red-muted); }
+    tr.row-pending { background: var(--amber-muted); }
+
+    .record-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .record-summary strong { color: var(--text); }
+
+    /* Skeleton loader */
+    .skeleton-stage {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skeleton-header {
+      padding: 0.85rem 1rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .skeleton-body { padding: 1rem; }
+
+    .skeleton-line {
+      height: 10px;
+      border-radius: 2px;
+      background: linear-gradient(
+        90deg,
+        var(--surface2) 0%,
+        var(--surface-raised) 45%,
+        var(--surface2) 90%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    .skeleton-line + .skeleton-line { margin-top: 0.6rem; }
+
+    .skeleton-line.w-40 { width: 40%; }
+    .skeleton-line.w-60 { width: 60%; }
+    .skeleton-line.w-80 { width: 80%; }
+    .skeleton-line.w-100 { width: 100%; }
+
+    .skeleton-badge {
+      width: 56px;
+      height: 18px;
+      border-radius: 3px;
+      background: linear-gradient(
+        90deg,
+        var(--surface2) 0%,
+        var(--surface-raised) 45%,
+        var(--surface2) 90%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Geometric progress bar during pipeline run */
+    .pipeline-progress {
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      display: none;
+    }
+
+    .pipeline-progress.visible { display: block; }
+
+    .pipeline-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.35s var(--ease-out);
+    }
+
+    .pipeline-progress.indeterminate .pipeline-progress-bar {
+      width: 30%;
+      animation: progressSlide 1.2s var(--ease-out) infinite;
+      transform: translateX(-100%);
+    }
+
+    @keyframes progressSlide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(400%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>GrowRev Pipeline Demo</h1>
+      <p class="lead">Ingest → Rule candidates → LLM prioritize → Policy → Human review → Execute → Audit</p>
+      <div class="rule"><strong>Core rule:</strong> The LLM never touches money. Only APPROVED actions reach the executor.</div>
+    </header>
+
+    <div class="controls">
+      <div>
+        <label for="scenario">Test scenario</label><br />
+        <select id="scenario"></select>
+      </div>
+      <button class="primary" id="runBtn">Run Pipeline</button>
+    </div>
+
+    <div class="pipeline-flow" id="flowBar">
+      <span class="flow-node" data-stage="ingest">Ingest</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node" data-stage="rules">Rule Candidates</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node" data-stage="llm_prioritize">LLM Prioritize</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node" data-stage="policy">Policy</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node human" data-stage="human_review">Human Review</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node" data-stage="execute">Execute / Block</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node" data-stage="audit">Audit</span>
+    </div>
+
+    <div class="pipeline-progress" id="pipelineProgress" aria-hidden="true">
+      <div class="pipeline-progress-bar" id="pipelineProgressBar"></div>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+    <div class="trust-banner" id="trustBanner"></div>
+
+    <div class="review-panel" id="reviewPanel">
+      <h3>Human Review Queue — manual approval required</h3>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">
+        ESCALATED actions exceed brand caps. Approve to execute, or reject to keep the DB unchanged.
+      </p>
+      <div id="reviewQueue"></div>
+    </div>
+
+    <div class="stages" id="stages">
+      <div class="empty">Select a scenario and click <strong>Run Pipeline</strong> to start.</div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const fmt = (n) => typeof n === "number" ? n.toLocaleString(undefined, { maximumFractionDigits: 2 }) : n;
+    const cpaClass = (cpa) => cpa >= 70 ? "cpa-bad" : cpa <= 30 ? "cpa-good" : "cpa-mid";
+
+    let currentSessionId = null;
+    let dbAfterPanel = null;
+    let decisionRecordPanel = null;
+    let lastPipelineResult = null;
+    let stageElMap = {};
+    let revealObserver = null;
+
+    function initScrollReveal() {
+      if (revealObserver) revealObserver.disconnect();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-revealed");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      );
+    }
+
+    function observeRevealElements(root = document) {
+      if (!revealObserver) return;
+      root.querySelectorAll(".stage.reveal-on-scroll:not(.is-revealed)").forEach((el) => {
+        revealObserver.observe(el);
+      });
+    }
+
+    function renderSkeletonStages(count = 4) {
+      return Array.from({ length: count }, () => `
+        <div class="skeleton-stage">
+          <div class="skeleton-header">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-badge"></div>
+          </div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-100"></div>
+            <div class="skeleton-line w-80"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>`).join("");
+    }
+
+    function setPipelineProgress(mode, percent) {
+      const bar = $("#pipelineProgress");
+      const fill = $("#pipelineProgressBar");
+      if (mode === "off") {
+        bar.classList.remove("visible", "indeterminate");
+        fill.style.width = "0%";
+        return;
+      }
+      bar.classList.add("visible");
+      if (mode === "indeterminate") {
+        bar.classList.add("indeterminate");
+        fill.style.width = "";
+      } else {
+        bar.classList.remove("indeterminate");
+        fill.style.width = `${percent}%`;
+      }
+    }
+
+    async function init() {
+      const sel = $("#scenario");
+      try {
+        const res = await fetch("/api/bootstrap");
+        if (!res.ok) throw new Error("Could not load scenarios — is the server running?");
+        const data = await res.json();
+        sel.innerHTML = "";
+        data.scenarios.forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = s.label;
+          sel.appendChild(opt);
+        });
+        sel.value = "mixed";
+      } catch (e) {
+        sel.innerHTML = '<option value="mixed">Client demo (offline — restart server)</option>';
+        $("#errorBox").textContent = e.message + " Run: python -m growrev.web_app";
+        $("#errorBox").classList.add("visible");
+      }
+    }
+
+    function stageOrder() {
+      return ["ingest", "rules", "llm_prioritize", "policy", "human_review", "execute", "audit"];
+    }
+
+    function setFlowStage(id, state) {
+      document.querySelectorAll(".flow-node").forEach((n) => {
+        n.classList.remove("active", "done");
+        if (n.dataset.stage === id) n.classList.add(state);
+        else if (state === "active") {
+          const order = stageOrder();
+          const ci = order.indexOf(id);
+          const ni = order.indexOf(n.dataset.stage);
+          if (ni >= 0 && ni < ci) n.classList.add("done");
+        }
+      });
+    }
+
+    function renderCampaignsTable(campaigns) {
+      return `<table>
+        <thead><tr>
+          <th>ID</th><th>Platform</th><th>CPA</th><th>Conv</th><th>Impr</th><th>Budget</th><th>Status</th>
+        </tr></thead>
+        <tbody>${campaigns.map((c) => `
+          <tr>
+            <td>${c.campaign_id}</td>
+            <td>${c.platform}</td>
+            <td class="${cpaClass(c.cpa)}">$${fmt(c.cpa)}</td>
+            <td>${c.conversions}</td>
+            <td>${fmt(c.impressions)}</td>
+            <td>$${fmt(c.daily_budget)}</td>
+            <td>${c.status}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+    }
+
+    function renderCaps(caps) {
+      const items = [
+        ["Max daily shift", `$${fmt(caps.max_daily_budget_shift)}`],
+        ["Max changes/week", caps.max_changes_per_week],
+        ["Min conversions", caps.min_conversions_before_acting],
+        ["Min impressions", fmt(caps.min_impressions_before_acting)],
+        ["Spend ceiling", `$${fmt(caps.spend_ceiling_per_campaign)}`],
+        ["Kill switch", caps.emergency_kill_switch_active ? "ACTIVE" : "off"],
+      ];
+      return `<div class="caps-grid">${items.map(([k, v]) =>
+        `<div class="cap-item"><span>${k}</span>${v}</div>`).join("")}</div>`;
+    }
+
+    function renderCandidates(candidates) {
+      if (!candidates.length) return "<p class='empty'>No candidates (test bypass or all skipped)</p>";
+      return `<table>
+        <thead><tr><th>Rule</th><th>Campaign</th><th>Action</th><th>Target</th><th>Reason</th><th>Priority</th></tr></thead>
+        <tbody>${candidates.map((c) => `
+          <tr>
+            <td><code>${c.rule_id}</code></td>
+            <td>${c.campaign_id}</td>
+            <td>${c.action_type}</td>
+            <td>${c.action_type === "PAUSE" ? "PAUSE" : "$" + fmt(c.target_value)}</td>
+            <td>${c.rule_reason}</td>
+            <td>${c.priority_hint}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+    }
+
+    function renderEditablePolicyTable(decisions) {
+      if (!decisions.length) return "<p class='empty'>No policy decisions</p>";
+      return `<table class="editable-table">
+        <thead><tr>
+          <th>Campaign</th><th>Action</th><th>Target</th>
+          <th>Status (override)</th><th>Code</th><th>Reason</th>
+          <th class="col-override">Apply</th>
+        </tr></thead>
+        <tbody>${decisions.map((d, i) => `
+          <tr data-policy-row="${i}"
+              data-campaign-id="${escapeAttr(d.campaign_id)}"
+              data-action-type="${d.action_type}"
+              data-target-value="${d.target_value}"
+              data-violation-code="${escapeAttr(d.violation_code || "")}"
+              data-violation-reason="${escapeAttr(d.violation_reason || "")}">
+            <td>${d.campaign_id}</td>
+            <td>${d.action_type}</td>
+            <td>${d.action_type === "PAUSE" ? "PAUSE" : "$" + fmt(d.target_value)}</td>
+            <td><select data-field="status" class="status-${d.status.toLowerCase()}">
+              <option value="APPROVED" ${d.status === "APPROVED" ? "selected" : ""}>APPROVED</option>
+              <option value="REJECTED" ${d.status === "REJECTED" ? "selected" : ""}>REJECTED</option>
+              <option value="ESCALATED" ${d.status === "ESCALATED" ? "selected" : ""}>ESCALATED</option>
+            </select></td>
+            <td>${d.violation_code || "—"}</td>
+            <td><input data-field="rationale" value="${escapeAttr(d.rationale)}" /></td>
+            <td class="col-override"><button type="button" class="row-apply row-apply-policy" title="Apply this row & re-run Execute">Apply</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+    }
+
+    function renderProposals(proposals) {
+      return `<table>
+        <thead><tr><th>Campaign</th><th>Action</th><th>Target</th><th>Rationale</th></tr></thead>
+        <tbody>${proposals.map((p) => `
+          <tr>
+            <td>${p.campaign_id}</td>
+            <td>${p.action_type}</td>
+            <td>${p.action_type === "PAUSE" ? "PAUSE" : "$" + fmt(p.target_value)}</td>
+            <td>${p.rationale}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+    }
+
+    function renderDecisions(decisions) {
+      return `<table>
+        <thead><tr><th>Campaign</th><th>Action</th><th>Status</th><th>Code</th><th>Reason</th></tr></thead>
+        <tbody>${decisions.map((d) => `
+          <tr>
+            <td>${d.campaign_id}</td>
+            <td>${d.action_type}</td>
+            <td class="status-${d.status.toLowerCase()}">${d.status}</td>
+            <td>${d.violation_code || "—"}</td>
+            <td>${d.violation_reason || "—"}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function matchPendingItem(pending, decision) {
+      return (pending || []).find((p) =>
+        p.campaign_id === decision.campaign_id
+        && p.action_type === decision.action_type
+        && Math.abs((p.target_value || 0) - (decision.target_value || 0)) < 0.01
+      );
+    }
+
+    function findExecutionForDecision(executions, decision) {
+      return (executions || []).find((ex) => {
+        if (!ex.action_id) return false;
+        const original = ex.original_state || {};
+        if (original.campaign_id !== decision.campaign_id) return false;
+        const next = ex.new_state || {};
+        if (decision.action_type === "PAUSE") return next.status === "PAUSED";
+        return Math.abs((next.daily_budget || 0) - (decision.target_value || 0)) < 0.01;
+      });
+    }
+
+    function summarizeExecution(ex) {
+      if (!ex) return null;
+      const original = ex.original_state || {};
+      const next = ex.new_state || {};
+      return {
+        budget_before: original.daily_budget,
+        budget_after: next.daily_budget,
+        status_before: original.status,
+        status_after: next.status,
+        timestamp: ex.timestamp,
+      };
+    }
+
+    function deriveFinalDecisionRecord(data) {
+      if (data.final_decision_record && data.final_decision_record.length) {
+        return data.final_decision_record;
+      }
+
+      const stages = data.stages || lastPipelineResult?.stages || [];
+      const policyStage = stages.find((s) => s.id === "policy");
+      const executeStage = stages.find((s) => s.id === "execute");
+      let decisions = data.decisions || policyStage?.data?.decisions || [];
+      if (!decisions.length) return [];
+
+      const pending = data.pending_reviews || lastPipelineResult?.pending_reviews || [];
+      const policyOverridden = data.policy_overridden || policyStage?.data?.overridden;
+      const execList = (data.auto_executions && data.auto_executions.length)
+        ? data.auto_executions.filter((e) => e.action_id)
+        : (executeStage?.data?.executions || []).filter((e) => e.action_id);
+      const recordedAt = new Date().toISOString();
+
+      return decisions.map((d) => {
+        const targetDisplay = d.action_type === "PAUSE" ? "PAUSE" : `$${fmt(d.target_value)}`;
+        const pendingItem = matchPendingItem(pending, d);
+        const base = {
+          campaign_id: d.campaign_id,
+          action_type: d.action_type,
+          target_value: d.target_value,
+          target_display: targetDisplay,
+          rationale: d.rationale,
+          policy_status: d.status,
+        };
+
+        if (d.status === "APPROVED") {
+          const ex = findExecutionForDecision(execList, d);
+          return {
+            ...base,
+            final_outcome: "APPROVED",
+            decision_source: policyOverridden ? "Policy override" : "Policy (auto-approved)",
+            executed: true,
+            execution: summarizeExecution(ex),
+            recorded_at: ex?.timestamp || recordedAt,
+          };
+        }
+        if (d.status === "REJECTED") {
+          return {
+            ...base,
+            final_outcome: "REJECTED",
+            decision_source: policyOverridden ? "Policy override" : "Policy engine",
+            executed: false,
+            violation_code: d.violation_code,
+            reason: d.violation_reason || "Rejected by policy",
+            recorded_at: recordedAt,
+          };
+        }
+        if (pendingItem && pendingItem.review_status === "approved") {
+          return {
+            ...base,
+            final_outcome: "APPROVED",
+            decision_source: "Human review (approved)",
+            executed: true,
+            execution: summarizeExecution(pendingItem.execution),
+            recorded_at: pendingItem.reviewed_at || recordedAt,
+          };
+        }
+        if (pendingItem && pendingItem.review_status === "rejected") {
+          return {
+            ...base,
+            final_outcome: "REJECTED",
+            decision_source: "Human review (rejected)",
+            executed: false,
+            reason: "Rejected by human reviewer",
+            violation_code: d.violation_code || pendingItem.violation_code,
+            recorded_at: pendingItem.reviewed_at || recordedAt,
+          };
+        }
+        return {
+          ...base,
+          final_outcome: "PENDING",
+          decision_source: "Awaiting human review",
+          executed: false,
+          violation_code: d.violation_code || pendingItem?.violation_code,
+          reason: d.violation_reason || pendingItem?.violation_reason || "Escalated — requires human review",
+          recorded_at: null,
+        };
+      });
+    }
+
+    function mergePipelineData(data) {
+      if (data.stages) {
+        lastPipelineResult = { ...data };
+        return lastPipelineResult;
+      }
+      lastPipelineResult = {
+        ...(lastPipelineResult || {}),
+        ...data,
+        pending_reviews: data.pending_reviews ?? lastPipelineResult?.pending_reviews,
+        db_after: data.db_after ?? lastPipelineResult?.db_after,
+        decisions: data.decisions ?? lastPipelineResult?.decisions,
+        auto_executions: data.auto_executions ?? lastPipelineResult?.auto_executions,
+        policy_overridden: data.policy_overridden ?? lastPipelineResult?.policy_overridden,
+      };
+      if (data.final_decision_record !== undefined) {
+        lastPipelineResult.final_decision_record = data.final_decision_record;
+      }
+      if (data.downstream && lastPipelineResult.stages) {
+        const stages = [...lastPipelineResult.stages];
+        for (const stage of data.downstream) {
+          const idx = stages.findIndex((s) => s.id === stage.id);
+          if (idx >= 0) stages[idx] = stage;
+          else stages.push(stage);
+        }
+        lastPipelineResult.stages = stages;
+        if (data.policy_overridden !== undefined) {
+          const policyStage = stages.find((s) => s.id === "policy");
+          if (policyStage?.data) policyStage.data.overridden = data.policy_overridden;
+        }
+      }
+      return lastPipelineResult;
+    }
+
+    function refreshDecisionRecord(data) {
+      const merged = mergePipelineData(data);
+      const records = deriveFinalDecisionRecord(merged);
+      if (!decisionRecordPanel) return;
+      const body = decisionRecordPanel.querySelector(".decision-record-body");
+      if (body) body.innerHTML = renderFinalDecisionRecord(records);
+    }
+
+    function formatRecordedAt(iso) {
+      if (!iso) return "—";
+      try {
+        return new Date(iso).toLocaleString();
+      } catch {
+        return iso;
+      }
+    }
+
+    function renderFinalDecisionRecord(records) {
+      if (!records || !records.length) {
+        return "<p class='empty'>No decisions recorded yet. Run the pipeline to populate this log.</p>";
+      }
+      const approved = records.filter((r) => r.final_outcome === "APPROVED").length;
+      const rejected = records.filter((r) => r.final_outcome === "REJECTED").length;
+      const pending = records.filter((r) => r.final_outcome === "PENDING").length;
+      const outcomeClass = (o) =>
+        o === "APPROVED" ? "outcome-approved" : o === "REJECTED" ? "outcome-rejected" : "outcome-pending";
+      const rowClass = (o) =>
+        o === "APPROVED" ? "row-approved" : o === "REJECTED" ? "row-rejected" : "row-pending";
+
+      return `
+        <div class="record-summary">
+          <span><strong>${records.length}</strong> total</span>
+          <span class="outcome-approved"><strong>${approved}</strong> approved</span>
+          <span class="outcome-rejected"><strong>${rejected}</strong> rejected</span>
+          ${pending ? `<span class="outcome-pending"><strong>${pending}</strong> pending review</span>` : ""}
+        </div>
+        <table>
+          <thead><tr>
+            <th>Final outcome</th>
+            <th>Campaign</th>
+            <th>Action</th>
+            <th>Target</th>
+            <th>Decision source</th>
+            <th>Executed</th>
+            <th>Reason / notes</th>
+            <th>Recorded at</th>
+          </tr></thead>
+          <tbody>${records.map((r) => {
+            const execNote = r.executed && r.execution
+              ? `Budget $${fmt(r.execution.budget_before)} → $${fmt(r.execution.budget_after)} · ${r.execution.status_before} → ${r.execution.status_after}`
+              : r.executed ? "Yes" : "No";
+            const reason = r.reason
+              || (r.violation_code ? `${r.violation_code}` : "")
+              || r.rationale
+              || "—";
+            return `<tr class="${rowClass(r.final_outcome)}">
+              <td class="${outcomeClass(r.final_outcome)}">${r.final_outcome}</td>
+              <td>${escapeHtml(r.campaign_id)}</td>
+              <td>${escapeHtml(r.action_type)}</td>
+              <td>${escapeHtml(r.target_display || (r.action_type === "PAUSE" ? "PAUSE" : "$" + fmt(r.target_value)))}</td>
+              <td>${escapeHtml(r.decision_source || "—")}</td>
+              <td>${execNote}</td>
+              <td style="font-size:0.82rem;color:var(--muted)">${escapeHtml(reason)}</td>
+              <td style="font-size:0.8rem;color:var(--muted)">${formatRecordedAt(r.recorded_at)}</td>
+            </tr>`;
+          }).join("")}</tbody>
+        </table>`;
+    }
+
+    function updateDecisionRecordPanel(data) {
+      refreshDecisionRecord(data);
+    }
+
+    function appendDecisionRecordPanel(container, data) {
+      decisionRecordPanel = document.createElement("div");
+      decisionRecordPanel.className = "stage visible decision-record-panel reveal-on-scroll";
+      decisionRecordPanel.innerHTML = `
+        <div class="stage-header">
+          <div>
+            <div class="stage-title">Final Decision Record</div>
+            <div class="stage-sub">Resolved outcomes after policy, human review, and audit — reference for future decisions</div>
+          </div>
+        </div>
+        <div class="stage-body decision-record-body"></div>`;
+      container.appendChild(decisionRecordPanel);
+      observeRevealElements(decisionRecordPanel);
+      refreshDecisionRecord(data);
+    }
+
+    function renderStageBody(stage) {
+      const d = stage.data;
+      switch (stage.id) {
+        case "ingest":
+          return `<div class="panel-title">Campaign metrics (Meta + Google)</div>
+            ${renderCampaignsTable(d.campaigns)}
+            <div class="panel-title" style="margin-top:1rem">Brand caps (hard limits)</div>
+            ${renderCaps(d.brand_caps)}`;
+        case "rules":
+          if (d.meta && d.meta.bypassed) {
+            return `<p class="empty">${d.meta.note || "Rules bypassed for this test scenario"}</p>`;
+          }
+          return `<div class="panel-title">${d.candidates.length} candidates · ${d.skipped.length} campaigns skipped by rules</div>
+            ${renderCandidates(d.candidates)}
+            ${d.skipped.length ? `<div class="panel-title" style="margin-top:1rem">Skipped</div>
+              <ul style="font-size:0.82rem;color:var(--muted);padding-left:1.2rem">
+                ${d.skipped.map((s) => `<li>${s.campaign_id}: ${s.reason}</li>`).join("")}
+              </ul>` : ""}`;
+        case "llm_prioritize":
+          if (d.meta && d.meta.bypassed) {
+            return `<p class="empty">LLM bypassed - forged proposals injected</p>${renderProposals(d.proposals)}`;
+          }
+          return `<div class="panel-title">Source: ${d.source} · ${d.input_candidates} in → ${d.kept} kept ${d.overridden ? "· <span style='color:#a8bdd4'>OVERRIDDEN</span>" : ""}</div>
+            ${d.dropped && d.dropped.length ? `<div class="panel-title" style="margin-top:0.5rem">Dropped by LLM</div>
+              <ul style="font-size:0.82rem;color:var(--muted);padding-left:1.2rem;margin-bottom:0.75rem">
+                ${d.dropped.map((x) => `<li>${x.candidate_id || "?"}: ${x.reason || "low priority"}</li>`).join("")}
+              </ul>` : ""}
+            <div class="panel-title">LLM proposals</div>
+            ${renderProposals(d.proposals)}`;
+        case "propose":
+          return `<div class="panel-title">Source: ${d.source}</div>${renderProposals(d.proposals)}`;
+        case "policy":
+          return `<div class="panel-title">Summary: ${d.summary.approved} approved · ${d.summary.rejected} rejected · ${d.summary.escalated} escalated ${d.overridden ? "· <span style='color:#a8bdd4'>OVERRIDDEN</span>" : ""}</div>
+            <div class="panel-title" style="margin-top:0.5rem">Policy decisions — change status per row, then Apply</div>
+            ${renderEditablePolicyTable(d.decisions)}`;
+        case "human_review":
+          return renderReviewQueue(d.items, true);
+        case "execute": {
+          let html = `<div class="panel-title">${d.executed_count} auto-executed · ${d.blocked_count} rejected · ${d.pending_review_count || 0} awaiting human review</div>`;
+          d.executions.filter((e) => e.action_id).forEach((e) => {
+            const o = e.original_state, n = e.new_state;
+            html += `<div class="exec-card">
+              <strong>EXECUTED</strong> ${e.action_id.slice(0, 8)}… · ${o.campaign_id}<br />
+              Budget $${fmt(o.daily_budget)} → $${fmt(n.daily_budget)} · Status ${o.status} → ${n.status}<br />
+              <span style="color:var(--muted)">${e.rationale}</span>
+            </div>`;
+          });
+          d.blocked.forEach((b) => {
+            html += `<div class="block-card">
+              <strong>BLOCKED</strong> ${b.campaign_id} · ${b.status} (${b.violation_code || "—"})<br />
+              <span style="color:var(--muted)">${b.violation_reason || ""}</span>
+            </div>`;
+          });
+          if (d.pending_escalated && d.pending_escalated.length) {
+            html += `<div class="panel-title" style="margin-top:0.75rem">Held for human review (not executed yet)</div>`;
+            d.pending_escalated.forEach((p) => {
+              html += `<div class="review-card" style="margin-bottom:0.5rem">
+                <strong>ESCALATED</strong> ${p.campaign_id} · ${p.action_type} · ${p.violation_code}<br />
+                <span style="color:var(--muted)">${p.violation_reason}</span>
+              </div>`;
+            });
+          }
+          return html;
+        }
+        case "audit": {
+          let html = "";
+          d.audit_log.forEach((e) => {
+            html += `<div class="exec-card">
+              <strong>${e.action_id.slice(0, 8)}…</strong> · ${e.original_state.campaign_id}<br />
+              Metrics: CPA $${e.triggering_metrics.cpa}, ${e.triggering_metrics.conversions} conv<br />
+              Before: $${fmt(e.original_state.daily_budget)} ${e.original_state.status} → After: $${fmt(e.new_state.daily_budget)} ${e.new_state.status}
+              ${e.rolled_back ? " · <em>rolled back</em>" : ""}
+            </div>`;
+          });
+          if (d.rollback_demo) {
+            const r = d.rollback_demo;
+            html += `<div class="exec-card" style="border-color:rgba(92,122,158,0.35);background:rgba(92,122,158,0.08)">
+              <strong>ROLLBACK DEMO</strong> · restored ${r.new_state.campaign_id} to snapshot<br />
+              Budget $${fmt(r.original_state.daily_budget)} → $${fmt(r.new_state.daily_budget)}
+            </div>`;
+          }
+          return html || "<p class='empty'>No audit entries</p>";
+        }
+        default:
+          return `<pre class="json-block">${JSON.stringify(d, null, 2)}</pre>`;
+      }
+    }
+
+    function buildStageEl(stage) {
+      const el = document.createElement("div");
+      el.className = "stage reveal-on-scroll";
+      el.dataset.stageId = stage.id;
+      const overridden = stage.data && stage.data.overridden;
+      el.innerHTML = `
+        <div class="stage-header">
+          <div>
+            <div class="stage-title">${stage.title}</div>
+            <div class="stage-sub">${stage.subtitle}</div>
+          </div>
+          <span class="badge complete ${overridden ? "overridden" : ""}">${overridden ? "overridden" : "pending"}</span>
+        </div>
+        <div class="stage-body">${renderStageBody(stage)}</div>`;
+      return el;
+    }
+
+    function escapeAttr(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    function bindOverrideButtons() {
+      document.querySelectorAll(".row-apply-policy").forEach((btn) => {
+        btn.addEventListener("click", applyPolicyOverride);
+      });
+    }
+
+    function collectPolicyDecisions() {
+      return [...document.querySelectorAll("[data-policy-row]")].map((row) => ({
+        campaign_id: row.dataset.campaignId,
+        action_type: row.dataset.actionType,
+        target_value: parseFloat(row.dataset.targetValue) || 0,
+        rationale: row.querySelector('[data-field="rationale"]').value.trim(),
+        status: row.querySelector('[data-field="status"]').value,
+        violation_code: row.dataset.violationCode || null,
+        violation_reason: row.dataset.violationReason || null,
+      }));
+    }
+
+    async function applyPolicyOverride() {
+      if (!currentSessionId) return;
+      const res = await fetch("/api/override/policy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: currentSessionId, decisions: collectPolicyDecisions() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showError(data.detail || "Policy override failed"); return; }
+      applyDownstreamUpdate(data);
+    }
+
+    function showError(msg) {
+      $("#errorBox").textContent = msg;
+      $("#errorBox").classList.add("visible");
+    }
+
+    function applyDownstreamUpdate(data) {
+      $("#errorBox").classList.remove("visible");
+      for (const stage of data.downstream) {
+        const el = stageElMap[stage.id] || document.querySelector(`.stage[data-stage-id="${stage.id}"]`);
+        if (!el) continue;
+        stageElMap[stage.id] = el;
+        const badge = el.querySelector(".badge");
+        if (stage.data.overridden) {
+          badge.textContent = "overridden";
+          badge.classList.add("overridden");
+        } else {
+          badge.textContent = "complete";
+        }
+        el.querySelector(".stage-body").innerHTML = renderStageBody(stage);
+      }
+      currentSessionId = data.session_id;
+      bindOverrideButtons();
+      if (dbAfterPanel) {
+        dbAfterPanel.innerHTML = renderCampaignsTable(Object.values(data.db_after));
+      }
+      showReviewPanel(data);
+      updateDecisionRecordPanel(data);
+      const tb = $("#trustBanner");
+      tb.classList.add("visible");
+      tb.innerHTML = `<strong>${data.message}</strong>${data.trust_boundary ? ` · ${data.trust_boundary.message}` : ""}`;
+    }
+
+    function attachOverrideControls(result) {
+      currentSessionId = result.session_id;
+      bindOverrideButtons();
+    }
+
+    function renderReviewQueue(items, embedded = false) {
+      if (!items || !items.length) {
+        return embedded ? "<p class='empty'>No items awaiting review</p>" : "";
+      }
+      return items.map((item) => {
+        const target = item.action_type === "PAUSE" ? "PAUSE" : `$${fmt(item.target_value)}`;
+        const resolved = item.review_status !== "pending";
+        const cls = resolved
+          ? item.review_status === "approved" ? "resolved-approved" : "resolved-rejected"
+          : "";
+        const statusLabel = resolved
+          ? `<strong style="color:${item.review_status === "approved" ? "var(--green)" : "var(--red)"}">${item.review_status.toUpperCase()}</strong>`
+          : `<span class="status-escalated">PENDING REVIEW</span>`;
+        const actions = !resolved && !embedded ? `
+          <div class="review-actions">
+            <button class="approve" data-queue="${item.queue_id}" data-approve="true">Approve</button>
+            <button class="reject" data-queue="${item.queue_id}" data-approve="false">Reject</button>
+          </div>` : "";
+        const execNote = item.execution ? `<div class="review-meta">Executed: budget $${fmt(item.execution.original_state.daily_budget)} → $${fmt(item.execution.new_state.daily_budget)}</div>` : "";
+        return `<div class="review-card ${cls}" data-queue-id="${item.queue_id}">
+          ${statusLabel} · <strong>${item.campaign_id}</strong> · ${item.action_type} → ${target}<br />
+          <span style="color:var(--muted);font-size:0.82rem">${item.rationale}</span><br />
+          <span class="review-meta">${item.violation_code}: ${item.violation_reason}</span>
+          ${execNote}
+          ${actions}
+        </div>`;
+      }).join("");
+    }
+
+    function showReviewPanel(result) {
+      const panel = $("#reviewPanel");
+      const queue = $("#reviewQueue");
+      if (!result.pending_reviews || !result.pending_reviews.length) {
+        panel.classList.remove("visible");
+        queue.innerHTML = "";
+        return;
+      }
+      currentSessionId = result.session_id;
+      panel.classList.add("visible");
+      queue.innerHTML = renderReviewQueue(result.pending_reviews);
+      queue.querySelectorAll("button[data-queue]").forEach((btn) => {
+        btn.addEventListener("click", () => handleReview(btn.dataset.queue, btn.dataset.approve === "true"));
+      });
+    }
+
+    async function handleReview(queueId, approve) {
+      if (!currentSessionId) return;
+      const res = await fetch("/api/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: currentSessionId, queue_id: queueId, approve }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        $("#errorBox").textContent = data.detail || "Review failed";
+        $("#errorBox").classList.add("visible");
+        return;
+      }
+      $("#reviewQueue").innerHTML = renderReviewQueue(data.pending_reviews);
+      $("#reviewQueue").querySelectorAll("button[data-queue]").forEach((btn) => {
+        btn.addEventListener("click", () => handleReview(btn.dataset.queue, btn.dataset.approve === "true"));
+      });
+      if (dbAfterPanel) {
+        dbAfterPanel.innerHTML = renderCampaignsTable(Object.values(data.db_after));
+      }
+      if (data.downstream) {
+        for (const stage of data.downstream) {
+          const el = stageElMap[stage.id] || document.querySelector(`.stage[data-stage-id="${stage.id}"]`);
+          if (!el) continue;
+          stageElMap[stage.id] = el;
+          const badge = el.querySelector(".badge");
+          if (stage.data.overridden) {
+            badge.textContent = "overridden";
+            badge.classList.add("overridden");
+          } else {
+            badge.textContent = "complete";
+          }
+          el.querySelector(".stage-body").innerHTML = renderStageBody(stage);
+        }
+        bindOverrideButtons();
+      }
+      updateDecisionRecordPanel(data);
+      const tb = $("#trustBanner");
+      tb.classList.add("visible");
+      tb.innerHTML = `<strong>Review update:</strong> ${data.message} · ${data.summary.pending} still pending`;
+    }
+
+    function updateDbAfterPanel(dbAfter) {
+      if (!dbAfterPanel) return;
+      dbAfterPanel.innerHTML = renderCampaignsTable(Object.values(dbAfter));
+    }
+
+    async function animateStages(result) {
+      const container = $("#stages");
+      container.innerHTML = "";
+      stageElMap = {};
+      setPipelineProgress("determinate", 0);
+
+      const stageEls = result.stages.map((s) => buildStageEl(s));
+      stageEls.forEach((el) => {
+        container.appendChild(el);
+        stageElMap[el.dataset.stageId] = el;
+      });
+      observeRevealElements(container);
+
+      const total = result.stages.length;
+      for (let i = 0; i < total; i++) {
+        setFlowStage(result.stages[i].id, "active");
+        stageEls[i].classList.add("visible", "active", "is-revealed");
+        stageEls[i].querySelector(".badge").textContent = "complete";
+        setPipelineProgress("determinate", Math.round(((i + 1) / total) * 100));
+        await new Promise((r) => setTimeout(r, 520));
+        stageEls[i].classList.remove("active");
+        setFlowStage(result.stages[i].id, "done");
+        const nextId = i < total - 1 ? result.stages[i + 1].id : null;
+        if (nextId) setFlowStage(nextId, "active");
+      }
+
+      document.querySelectorAll(".flow-node").forEach((n) => {
+        const ran = result.stages.map((s) => s.id);
+        if (ran.includes(n.dataset.stage)) n.classList.add("done");
+      });
+
+      const tb = $("#trustBanner");
+      tb.classList.add("visible");
+      tb.innerHTML = `<strong>Money trust boundary:</strong> ${result.trust_boundary.message}`;
+
+      const dbPanel = document.createElement("div");
+      dbPanel.className = "stage visible reveal-on-scroll";
+      dbPanel.innerHTML = `
+        <div class="stage-header">
+          <div><div class="stage-title">DB Before vs After</div>
+          <div class="stage-sub">Mock campaign state comparison (updates when you approve reviews)</div></div>
+        </div>
+        <div class="stage-body grid-2">
+          <div><div class="panel-title">Before</div>${renderCampaignsTable(Object.values(result.db_before))}</div>
+          <div><div class="panel-title">After</div><div id="dbAfterTable">${renderCampaignsTable(Object.values(result.db_after))}</div></div>
+        </div>`;
+      container.appendChild(dbPanel);
+      observeRevealElements(dbPanel);
+      dbAfterPanel = document.getElementById("dbAfterTable");
+      appendDecisionRecordPanel(container, result);
+      refreshDecisionRecord(result);
+      attachOverrideControls(result);
+      setPipelineProgress("off");
+    }
+
+    $("#runBtn").addEventListener("click", async () => {
+      const btn = $("#runBtn");
+      const err = $("#errorBox");
+      err.classList.remove("visible");
+      btn.disabled = true;
+      btn.classList.add("loading");
+      btn.textContent = "Running…";
+      $("#trustBanner").classList.remove("visible");
+      $("#reviewPanel").classList.remove("visible");
+      decisionRecordPanel = null;
+      lastPipelineResult = null;
+      document.querySelectorAll(".flow-node").forEach((n) => n.classList.remove("active", "done"));
+      $("#stages").innerHTML = renderSkeletonStages(4);
+      setPipelineProgress("indeterminate");
+
+      try {
+        const res = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scenario: $("#scenario").value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Pipeline run failed");
+        await animateStages(data);
+        showReviewPanel(data);
+      } catch (e) {
+        err.textContent = e.message;
+        err.classList.add("visible");
+        $("#stages").innerHTML = '<div class="empty">Pipeline run failed. Try the <strong>Normal</strong> scenario (no API key needed).</div>';
+        setPipelineProgress("off");
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        btn.textContent = "Run Pipeline";
+      }
+    });
+
+    initScrollReveal();
+    init();
+  </script>
+</body>
+</html>

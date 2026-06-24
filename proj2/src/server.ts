@@ -200,15 +200,19 @@ wss.on('connection', (ws: WebSocket) => {
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
-  console.log(chalk.bold.cyan('║  VidyaGyan — Inbound Voice Agent (verify by name)            ║'));
-  console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝\n'));
-  console.log(chalk.green(`  → Open http://localhost:${PORT}`));
-  console.log(
-    chalk.gray(
-      `  → Gemini: ${process.env.GEMINI_API_KEY ? chalk.green('configured') : chalk.red('set GEMINI_API_KEY in .env')}`
-    )
-  );
-  console.log('');
-});
+if (!process.env.VERCEL) {
+  httpServer.listen(PORT, () => {
+    console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
+    console.log(chalk.bold.cyan('║  VidyaGyan — Inbound Voice Agent (verify by name)            ║'));
+    console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝\n'));
+    console.log(chalk.green(`  → Open http://localhost:${PORT}`));
+    console.log(
+      chalk.gray(
+        `  → Gemini: ${process.env.GEMINI_API_KEY ? chalk.green('configured') : chalk.red('set GEMINI_API_KEY in .env')}`
+      )
+    );
+    console.log('');
+  });
+}
+
+export default httpServer;
