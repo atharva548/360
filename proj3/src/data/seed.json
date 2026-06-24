@@ -1,0 +1,109 @@
+{
+  "communities": [
+    {
+      "id": "comm-mumbai-hindi-01",
+      "name": "Atlas Mumbai — Hajj & Umrah (Hindi)",
+      "city": "Mumbai",
+      "language": "Hindi",
+      "interest": "Both",
+      "proxyCapacity": 50,
+      "currentCount": 28,
+      "inviteLink": "https://chat.whatsapp.com/InviteMumbaiHindi01",
+      "status": "Active"
+    },
+    {
+      "id": "comm-mumbai-hindi-02",
+      "name": "Atlas Mumbai — Umrah Pilgrims (Hindi)",
+      "city": "Mumbai",
+      "language": "Hindi",
+      "interest": "Umrah",
+      "proxyCapacity": 40,
+      "currentCount": 12,
+      "inviteLink": "https://chat.whatsapp.com/InviteMumbaiHindi02",
+      "status": "Active"
+    },
+    {
+      "id": "comm-delhi-urdu-01",
+      "name": "Atlas Delhi — Hajj Community (Urdu)",
+      "city": "Delhi",
+      "language": "Urdu",
+      "interest": "Hajj",
+      "proxyCapacity": 45,
+      "currentCount": 19,
+      "inviteLink": "https://chat.whatsapp.com/InviteDelhiUrdu01",
+      "status": "Active"
+    },
+    {
+      "id": "comm-hyderabad-telugu-01",
+      "name": "Atlas Hyderabad — Umrah Group (Telugu)",
+      "city": "Hyderabad",
+      "language": "Telugu",
+      "interest": "Umrah",
+      "proxyCapacity": 35,
+      "currentCount": 8,
+      "inviteLink": "https://chat.whatsapp.com/InviteHyderabadTelugu01",
+      "status": "Active"
+    },
+    {
+      "id": "comm-chennai-tamil-01",
+      "name": "Atlas Chennai — Hajj Pilgrims (Tamil)",
+      "city": "Chennai",
+      "language": "Tamil",
+      "interest": "Hajj",
+      "proxyCapacity": 30,
+      "currentCount": 30,
+      "inviteLink": "https://chat.whatsapp.com/InviteChennaiTamil01",
+      "status": "Full"
+    },
+    {
+      "id": "comm-bangalore-kannada-01",
+      "name": "Atlas Bangalore — Umrah Community (Kannada)",
+      "city": "Bangalore",
+      "language": "Kannada",
+      "interest": "Umrah",
+      "proxyCapacity": 25,
+      "currentCount": 14,
+      "inviteLink": "https://chat.whatsapp.com/InviteBangaloreKannada01",
+      "status": "Privacy Risk"
+    },
+    {
+      "id": "comm-lucknow-hindi-01",
+      "name": "Atlas Lucknow — Hajj Pilgrims (Hindi)",
+      "city": "Lucknow",
+      "language": "Hindi",
+      "interest": "Hajj",
+      "proxyCapacity": 40,
+      "currentCount": 5,
+      "inviteLink": "https://chat.whatsapp.com/InviteLucknowHindi01",
+      "status": "Paused"
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead-001",
+      "name": "Ahmed Khan",
+      "phone": "+919876543210",
+      "city": "Mumbai",
+      "language": "Hindi",
+      "interest": "Both",
+      "consented": true,
+      "routedCommunityId": "comm-mumbai-hindi-01",
+      "timestamp": "2026-06-20T10:30:00.000Z"
+    },
+    {
+      "id": "lead-002",
+      "name": "Fatima Begum",
+      "phone": "+919123456789",
+      "city": "Delhi",
+      "language": "Urdu",
+      "interest": "Hajj",
+      "consented": true,
+      "routedCommunityId": "comm-delhi-urdu-01",
+      "timestamp": "2026-06-21T14:15:00.000Z"
+    }
+  ],
+  "dispatchTasks": [],
+  "rejectedRoutingAttempts": [],
+  "joinClickLog": [],
+  "suppressedPhones": ["+919000000000"]
+}

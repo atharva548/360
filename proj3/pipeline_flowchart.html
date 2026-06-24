@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas Travels — Community Gateway Pipeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a1210;
+      --surface: #122019;
+      --surface-2: #1a2e24;
+      --border: #2a4035;
+      --text: #ecfdf5;
+      --muted: #86a897;
+      --accent: #34d399;
+      --green: #25d366;
+      --red: #f87171;
+      --amber: #fbbf24;
+      --gold: #c9a227;
+      --purple: #a78bfa;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0d2818 0%, #0a1210 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2rem 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    header .tagline {
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--muted);
+      max-width: 760px;
+      font-size: 0.95rem;
+    }
+
+    .core-rule {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      max-width: 760px;
+    }
+
+    .core-rule strong { color: var(--amber); }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 18, 16, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--border);
+      background: var(--surface);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 4rem;
+    }
+
+    section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    section .subtitle {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .diagram-card .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .split-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .split-card.auto { border-color: rgba(52, 211, 153, 0.4); }
+    .split-card.manual { border-color: rgba(251, 191, 36, 0.4); }
+    .split-card.blocked { border-color: rgba(248, 113, 113, 0.4); }
+
+    .split-card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+
+    .split-card.auto h3 { color: var(--accent); }
+    .split-card.manual h3 { color: var(--amber); }
+    .split-card.blocked h3 { color: var(--red); }
+
+    .split-card ul {
+      list-style: none;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .split-card li {
+      padding: 0.25rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .split-card li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    table.ref {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 1.25rem;
+    }
+
+    table.ref th,
+    table.ref td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+    }
+
+    table.ref th {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    table.ref td { background: var(--surface); }
+
+    table.ref code {
+      background: var(--surface-2);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: var(--purple);
+    }
+
+    .examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .example {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .example h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .example.success h3 { color: var(--accent); }
+    .example.reject h3 { color: var(--red); }
+    .example.dispatch h3 { color: var(--amber); }
+
+    .example pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .example .ok { color: var(--accent); }
+    .example .fail { color: var(--red); }
+    .example .warn { color: var(--amber); }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="tagline">Project C · Atlas Travels</p>
+    <h1>WhatsApp Community Gateway — Pipeline &amp; Flow</h1>
+    <p>
+      One smart link routes pilgrims to the right private WhatsApp Community by city and language.
+      Broadcasting stays operator-assisted — no unofficial automation.
+    </p>
+    <div class="core-rule">
+      <strong>Compliance boundary:</strong> There is no official WhatsApp Communities API.
+      Routing &amp; task generation are automated. Community creation and message sending are
+      <strong>manual, human-in-the-loop</strong> only. No browser bots in this build.
+    </div>
+  </header>
+
+  <nav>
+    <a href="#overview">System Overview</a>
+    <a href="#routing">Routing Engine</a>
+    <a href="#dispatch">Assisted Dispatch</a>
+    <a href="#simulation">Simulation Panel</a>
+    <a href="#data">Data Store</a>
+    <a href="#examples">Example Flows</a>
+    <a href="#routes">API Routes</a>
+  </nav>
+
+  <main>
+    <!-- 1. System Overview -->
+    <section id="overview">
+      <h2>1 — System Overview</h2>
+      <p class="subtitle">Two parallel pipelines: automated user ingestion (left) and assisted operator dispatch (right).</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart LR
+    subgraph public ["PUBLIC — Automated"]
+        Landing["Landing Page<br/>/"]
+        Form["GatewayForm<br/>name · phone · city · language · consent"]
+        API1["POST /api/leads"]
+        Router["router.ts<br/>routeLead()"]
+        Success["JoinSuccess UI<br/>invite link CTA"]
+        WA1["User taps native<br/>WhatsApp invite link"]
+    end
+
+    subgraph operator ["OPERATOR — Assisted"]
+        Dash["Operator Dashboard<br/>/operator"]
+        Composer["Broadcast Composer<br/>message + segment filter"]
+        API2["POST /api/dispatch"]
+        Tasks["DispatchTaskList<br/>1 row per community"]
+        Manual["Operator: Copy → WhatsApp Web"]
+        Status["Mark Sent / Mark Failed"]
+    end
+
+    subgraph store ["In-Memory Datastore"]
+        DB[("getStore()")]
+        Comm["Communities"]
+        Leads["Leads"]
+        Dispatch["DispatchTasks"]
+        Reject["RejectedRoutingAttempts"]
+    end
+
+    Landing --> Form --> API1 --> Router
+    Router --> DB
+    Router -->|success| Success --> WA1
+    Router -->|fail| Reject
+
+    Dash --> Composer --> API2 --> Tasks
+    Tasks --> Manual --> Status
+    API2 --> Dispatch
+    Status -->|"PATCH /api/dispatch"| Dispatch
+
+    DB --- Comm
+    DB --- Leads
+    DB --- Dispatch
+    DB --- Reject
+        </pre>
+      </div>
+
+      <div class="split-grid">
+        <div class="split-card auto">
+          <h3>✓ Automated (compliant)</h3>
+          <ul>
+            <li>Public landing form + consent capture</li>
+            <li>Deterministic segment + capacity router</li>
+            <li>Lead logging &amp; rejection audit</li>
+            <li>Dispatch task list generation</li>
+            <li>Native invite link redirect</li>
+          </ul>
+        </div>
+        <div class="split-card manual">
+          <h3>⚠ Assisted / manual (required)</h3>
+          <ul>
+            <li>Creating WhatsApp Communities</li>
+            <li>Copy message → send via WhatsApp Web</li>
+            <li>Proxy count vs real member reconciliation</li>
+            <li>Mark Sent / Failed per task row</li>
+          </ul>
+        </div>
+        <div class="split-card blocked">
+          <h3>✕ Not in this build</h3>
+          <ul>
+            <li>Browser bots / unofficial scrapers</li>
+            <li>Auto-creating communities</li>
+            <li>Auto-broadcasting into communities</li>
+            <li>Reading live WhatsApp member counts</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Routing Engine -->
+    <section id="routing">
+      <h2>2 — Routing Engine (Automated)</h2>
+      <p class="subtitle">Deterministic decision tree in <code>router.ts</code> — no LLM, no randomness.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TD
+    Start(["Lead submitted<br/>POST /api/leads"]) --> Consent{Consent<br/>checked?}
+    Consent -->|No| R1["Log rejection<br/>Return 422"]
+    Consent -->|Yes| Match["Filter communities<br/>city + language match"]
+
+    Match --> Found{Any match?}
+    Found -->|No| R2["Log rejection<br/>No segment found"]
+    Found -->|Yes| Filter["Remove ineligible:<br/>status = Full<br/>status = Privacy Risk<br/>currentCount ≥ capacity − buffer"]
+
+    Filter --> Eligible{Any eligible?}
+    Eligible -->|No| R3["Log rejection<br/>All full or blocked"]
+    Eligible -->|Yes| Pick["Pick lowest currentCount<br/>load balancing"]
+
+    Pick --> Inc["currentCount += 1"]
+    Inc --> FullCheck{currentCount ≥<br/>proxyCapacity?}
+    FullCheck -->|Yes| SetFull["status → Full"]
+    FullCheck -->|No| Keep["status stays Active"]
+    SetFull --> LogLead
+    Keep --> LogLead["Create Lead record<br/>routedCommunityId set"]
+    LogLead --> Return(["Return community<br/>+ inviteLink"])
+
+    R1 --> End(["User sees error"])
+    R2 --> End
+    R3 --> End
+        </pre>
+      </div>
+
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Value</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Capacity buffer</td>
+            <td><code>PROXY_CAPACITY_BUFFER = 5</code></td>
+            <td><code>constants.ts</code></td>
+          </tr>
+          <tr>
+            <td>Eligible threshold</td>
+            <td><code>currentCount &lt; proxyCapacity − 5</code></td>
+            <td><code>router.ts → isEligible()</code></td>
+          </tr>
+          <tr>
+            <td>Best match selection</td>
+            <td>Lowest <code>currentCount</code> among eligible</td>
+            <td><code>router.ts → routeLead()</code></td>
+          </tr>
+          <tr>
+            <td>Skipped statuses</td>
+            <td><code>Full</code>, <code>Privacy Risk</code></td>
+            <td><code>router.ts → isEligible()</code></td>
+          </tr>
+          <tr>
+            <td>Auto-mark Full</td>
+            <td>When <code>currentCount ≥ proxyCapacity</code></td>
+            <td><code>router.ts → routeLead()</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. Assisted Dispatch -->
+    <section id="dispatch">
+      <h2>3 — Assisted Dispatch Queue</h2>
+      <p class="subtitle">One broadcast → N operator tasks. Human sends each message; system tracks status to prevent duplicates.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TD
+    Op(["Operator opens<br/>/operator"]) --> Draft["Draft message template<br/>Select segment: City or Language"]
+    Draft --> Submit["POST /api/dispatch<br/>createDispatchTasks()"]
+    Submit --> Split["Filter matching communities<br/>Sort by name<br/>1 task per community"]
+    Split --> Queue["DispatchTaskList<br/>status = Pending"]
+
+    Queue --> Row["For each task row"]
+    Row --> Show["Show: community name<br/>proxy count / capacity"]
+    Row --> Copy["Copy Message button"]
+    Row --> Launch["Launch WhatsApp button<br/>web.whatsapp.com/send?text=…"]
+    Row --> Sent["Mark Sent"]
+    Row --> Fail["Mark Failed"]
+
+    Copy --> ManualSend["Operator pastes &amp; sends<br/>manually in WhatsApp"]
+    Launch --> ManualSend
+    ManualSend --> Sent
+    ManualSend --> Fail
+
+    Sent --> Patch1["PATCH /api/dispatch<br/>status → Sent"]
+    Fail --> Patch2["PATCH /api/dispatch<br/>status → Failed"]
+    Patch1 --> Lock["Sent tasks locked<br/>no duplicate sends"]
+    Patch2 --> Queue
+        </pre>
+      </div>
+    </section>
+
+    <!-- 4. Simulation -->
+    <section id="simulation">
+      <h2>4 — Simulation Panel (Dev Only)</h2>
+      <p class="subtitle">Edge-case testing — visible only when <code>NODE_ENV = development</code>.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart LR
+    Dev["SimulationPanel<br/>fixed sidebar"] --> Btn["Simulate Capacity Overflow"]
+    Btn --> API["POST /api/simulate<br/>10 dummy Mumbai/Hindi leads"]
+    API --> Loop["Loop routeLead() × 10"]
+    Loop --> Route["Routes to comm-02 first<br/>then comm-01<br/>lowest count wins"]
+    Loop --> Reject["When all eligible full<br/>→ rejection logged"]
+    Reject --> Log["RejectedRoutingLog<br/>visible in panel"]
+    Route --> Counts["Proxy counts increment<br/>communities may hit Full"]
+        </pre>
+      </div>
+    </section>
+
+    <!-- 5. Data Store -->
+    <section id="data">
+      <h2>5 — Data Store</h2>
+      <p class="subtitle">In-memory singleton seeded from <code>src/data/seed.json</code>. Resets on server restart.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+erDiagram
+    COMMUNITIES ||--o{ LEADS : "routes to"
+    COMMUNITIES ||--o{ DISPATCH_TASKS : "target of"
+
+    COMMUNITIES {
+        string id PK
+        string name
+        string city
+        string language
+        int proxyCapacity
+        int currentCount
+        string inviteLink
+        string status
+    }
+
+    LEADS {
+        string id PK
+        string name
+        string phone
+        string city
+        string language
+        boolean consented
+        string routedCommunityId FK
+        string timestamp
+    }
+
+    DISPATCH_TASKS {
+        string id PK
+        string messageText
+        string targetSegment
+        string status
+        string communityId FK
+        string createdAt
+    }
+
+    REJECTED_ROUTING {
+        string id PK
+        string name
+        string phone
+        string city
+        string language
+        string reason
+        string timestamp
+    }
+        </pre>
+      </div>
+
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Seed community</th>
+            <th>City / Language</th>
+            <th>Status</th>
+            <th>Purpose in demo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mumbai Hajj &amp; Umrah</td>
+            <td>Mumbai / Hindi</td>
+            <td><code>Active</code></td>
+            <td>Primary segment, higher count</td>
+          </tr>
+          <tr>
+            <td>Mumbai Umrah Pilgrims</td>
+            <td>Mumbai / Hindi</td>
+            <td><code>Active</code></td>
+            <td>Fallback when primary fills</td>
+          </tr>
+          <tr>
+            <td>Delhi Hajj Community</td>
+            <td>Delhi / Urdu</td>
+            <td><code>Active</code></td>
+            <td>Different city/language segment</td>
+          </tr>
+          <tr>
+            <td>Hyderabad Umrah Group</td>
+            <td>Hyderabad / Telugu</td>
+            <td><code>Active</code></td>
+            <td>Third active segment</td>
+          </tr>
+          <tr>
+            <td>Chennai Hajj Pilgrims</td>
+            <td>Chennai / Tamil</td>
+            <td><code>Full</code></td>
+            <td>Skipped by router (at capacity)</td>
+          </tr>
+          <tr>
+            <td>Bangalore Umrah Community</td>
+            <td>Bangalore / Kannada</td>
+            <td><code>Privacy Risk</code></td>
+            <td>Skipped by router (suspended)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6. Example Flows -->
+    <section id="examples">
+      <h2>6 — Example Flows</h2>
+      <p class="subtitle">Three concrete paths through the MVP.</p>
+      <div class="examples">
+        <div class="example success">
+          <h3>✓ Successful route — Mumbai / Hindi</h3>
+          <pre>
+User fills form + checks consent
+  → POST /api/leads
+  → Match: 2 Mumbai/Hindi communities
+  → Skip none (both Active, under threshold)
+  → Pick comm-mumbai-hindi-02 (lower count)
+  → currentCount: 12 → 13
+  → Lead logged, invite link returned
+  → User taps "Join WhatsApp Community"
+          </pre>
+        </div>
+        <div class="example reject">
+          <h3>✕ Rejected route — Bangalore / Kannada</h3>
+          <pre>
+User fills form + consent
+  → POST /api/leads
+  → Match: 1 Bangalore/Kannada community
+  → Status = <span class="fail">Privacy Risk</span> → ineligible
+  → Log rejection with reason
+  → Return 422: segment unavailable
+          </pre>
+        </div>
+        <div class="example dispatch">
+          <h3>⚠ Assisted broadcast — City: Mumbai</h3>
+          <pre>
+Operator drafts Umrah package message
+  → Filter by City = Mumbai
+  → 2 tasks created (both Mumbai communities)
+  → Row 1: Copy → WhatsApp Web → <span class="ok">Mark Sent</span>
+  → Row 2: Copy → WhatsApp Web → <span class="ok">Mark Sent</span>
+  → Sent rows locked (duplicate prevention)
+          </pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. API Routes -->
+    <section id="routes">
+      <h2>7 — API Routes</h2>
+      <p class="subtitle">All server logic lives under <code>src/app/api/</code>.</p>
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Route</th>
+            <th>Action</th>
+            <th>File</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>POST</td>
+            <td><code>/api/leads</code></td>
+            <td>Route lead → community + log</td>
+            <td><code>api/leads/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>GET</td>
+            <td><code>/api/communities</code></td>
+            <td>Full datastore snapshot</td>
+            <td><code>api/communities/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>POST</td>
+            <td><code>/api/dispatch</code></td>
+            <td>Generate operator task list</td>
+            <td><code>api/dispatch/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>PATCH</td>
+            <td><code>/api/dispatch</code></td>
+            <td>Update task status (Sent / Failed)</td>
+            <td><code>api/dispatch/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>GET</td>
+            <td><code>/api/dispatch</code></td>
+            <td>List all dispatch tasks</td>
+            <td><code>api/dispatch/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>POST</td>
+            <td><code>/api/simulate</code></td>
+            <td>Inject 10 dummy leads (dev only)</td>
+            <td><code>api/simulate/route.ts</code></td>
+          </tr>
+          <tr>
+            <td>GET</td>
+            <td><code>/api/simulate</code></td>
+            <td>Fetch rejection log (dev only)</td>
+            <td><code>api/simulate/route.ts</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    Atlas Travels · Project C MVP ·
+    <a href="http://localhost:3000">Public Gateway</a> ·
+    <a href="http://localhost:3000/operator">Operator Dashboard</a> ·
+    Open this file directly in any browser — no server required for the diagram.
+  </footer>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "dark",
+      themeVariables: {
+        primaryColor: "#1a2e24",
+        primaryTextColor: "#ecfdf5",
+        primaryBorderColor: "#34d399",
+        lineColor: "#86a897",
+        secondaryColor: "#122019",
+        tertiaryColor: "#0a1210",
+        fontFamily: "Segoe UI, system-ui, sans-serif"
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: "basis",
+        padding: 12
+      }
+    });
+  </script>
+</body>
+</html>

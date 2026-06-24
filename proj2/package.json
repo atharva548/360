@@ -1,0 +1,30 @@
+{
+  "name": "vidyagyan-voice-agent",
+  "version": "1.0.0",
+  "description": "Project B | VidyaGyan (HCL): AI Voice Agent — functional core prototype",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/server.ts",
+    "live": "tsx src/server.ts",
+    "demo": "tsx src/server.ts",
+    "cli": "tsx src/run_demo.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@google/genai": "^2.9.0",
+    "chalk": "^5.3.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ws": "^8.21.0"
+  }
+}
