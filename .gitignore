@@ -1,0 +1,8 @@
+# Local-only artifacts (not part of the repo)
+proj2/
+proj3/
+*.exe
+*.msi
+*.msix
+*.pdf
+TEAM_INTRO.md

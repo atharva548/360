@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowRev — Campaign Optimization Overview</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #fff;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --muted: #666;
+      --accent: #2563eb;
+      --green: #16a34a;
+      --red: #dc2626;
+      --amber: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .rule {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: #991b1b;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+
+    .flow span {
+      padding: 0.35rem 0.65rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .flow .arrow { color: var(--muted); border: none; background: none; padding: 0; }
+
+    .layers {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .layer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+    }
+
+    .layer-num {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .layer-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .layer-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .example {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .example-head {
+      padding: 0.65rem 1rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
+    }
+
+    .badge.approved { background: #dcfce7; color: var(--green); }
+    .badge.rejected { background: #fee2e2; color: var(--red); }
+    .badge.escalated { background: #fef3c7; color: var(--amber); }
+
+    .example-body {
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      gap: 0.5rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding-top: 0.1rem;
+    }
+
+    .step-text { color: var(--text); }
+
+    .step-text code {
+      font-size: 0.8rem;
+      background: #f4f4f5;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+    }
+
+    .caps {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 1rem 0;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .caps strong { color: var(--text); font-weight: 600; }
+
+    footer {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <h1>GrowRev</h1>
+      <p class="lead">
+        Automated paid-media campaign optimization. An AI analyzes performance and
+        suggests budget or status changes — but only approved actions are executed.
+      </p>
+      <p class="rule">
+        <strong>Core rule:</strong> The AI never touches money. It outputs suggestions only.
+        Every change passes through deterministic rules before execution.
+      </p>
+    </header>
+
+    <h2>How it works</h2>
+    <div class="flow">
+      <span>Data in</span>
+      <span class="arrow">→</span>
+      <span>AI suggests</span>
+      <span class="arrow">→</span>
+      <span>Rules check</span>
+      <span class="arrow">→</span>
+      <span>Code applies</span>
+    </div>
+
+    <div class="layers">
+      <div class="layer">
+        <div class="layer-num">Layer 1</div>
+        <div class="layer-title">Data</div>
+        <div class="layer-desc">Campaign metrics (spend, CPA, conversions, budget) and brand safety limits.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">Layer 2</div>
+        <div class="layer-title">AI Proposals</div>
+        <div class="layer-desc">Gemini reads metrics and returns structured suggestions — pause losers, boost winners. No execution.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">Layer 3</div>
+        <div class="layer-title">Policy</div>
+        <div class="layer-desc">Deterministic checks: data thresholds, budget limits, weekly caps, kill switch. Returns Approved, Rejected, or Escalated.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-num">Layer 4</div>
+        <div class="layer-title">Executor</div>
+        <div class="layer-desc">Applies approved changes only. Saves a snapshot before each action so changes can be rolled back.</div>
+      </div>
+    </div>
+
+    <div class="caps">
+      <strong>Brand limits (example):</strong>
+      Max budget shift $500/day · Max 3 changes/week · Min 50 conversions &amp; 10k impressions to act · $5,000 spend ceiling · Emergency kill switch
+    </div>
+
+    <h2>Pipeline examples</h2>
+
+    <!-- Case 1: Winner -->
+    <div class="example">
+      <div class="example-head">
+        Winner — budget increase
+        <span class="badge approved">Approved</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text"><code>camp_003</code> · CPA $18 · 228 conversions · budget $500/day</div>
+        </div>
+        <div class="step">
+          <div class="step-label">AI</div>
+          <div class="step-text">Shift budget to <strong>$700</strong> — low CPA, strong performer</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">Shift of $200 is within $500 limit → <strong>Approved</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Snapshot saved → applies <code>SHIFT_BUDGET</code> → budget $500 → $700. Audit log entry written.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">Campaign DB updated. Rollback available.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 2: Losers -->
+    <div class="example">
+      <div class="example-head">
+        Losers — pause or cut budget
+        <span class="badge approved">Approved</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text"><code>camp_001</code> CPA $85 · <code>camp_002</code> CPA $92 — both above target</div>
+        </div>
+        <div class="step">
+          <div class="step-label">AI</div>
+          <div class="step-text">Propose <strong>PAUSE</strong> or budget reduction for high-CPA campaigns</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">Sufficient data, within limits → <strong>Approved</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Snapshot saved → applies <code>PAUSE</code> or <code>SHIFT_BUDGET</code> per campaign. Audit log entry written.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">High-CPA campaigns paused or budget reduced in DB.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 3: Insufficient data -->
+    <div class="example">
+      <div class="example-head">
+        Insufficient data — too early to act
+        <span class="badge rejected">Rejected</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text"><code>camp_005</code> · 2 conversions · 800 impressions (below minimums)</div>
+        </div>
+        <div class="step">
+          <div class="step-label">AI</div>
+          <div class="step-text">May suggest PAUSE — but data is unreliable</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">Below 50 conversions / 10k impressions → <strong>Rejected</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Not invoked — status is Rejected, no action applied.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">No change. Campaign stays active at $100/day.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 4: Escalation -->
+    <div class="example">
+      <div class="example-head">
+        Oversized budget shift — needs human review
+        <span class="badge escalated">Escalated</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text"><code>camp_003</code> · current budget $500</div>
+        </div>
+        <div class="step">
+          <div class="step-label">AI</div>
+          <div class="step-text">Shift budget to <strong>$1,501</strong> (+$1,001)</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">Shift exceeds $500/day cap → <strong>Escalated</strong> for human review</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Not invoked — Escalated proposals require human approval first.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">Budget unchanged at $500. Queued for review.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 5: Kill switch -->
+    <div class="example">
+      <div class="example-head">
+        Emergency kill switch
+        <span class="badge rejected">Rejected</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text">4 legitimate AI proposals (2 pauses, 2 budget shifts)</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Trigger</div>
+          <div class="step-text">Brand emergency kill switch activated</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">All proposals → <strong>Rejected</strong> immediately</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Not invoked — kill switch blocks all proposals before execution.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">All campaigns remain active. No budgets changed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 6: Adversarial -->
+    <div class="example">
+      <div class="example-head">
+        Rogue AI output — blocked
+        <span class="badge rejected">Rejected</span>
+      </div>
+      <div class="example-body">
+        <div class="step">
+          <div class="step-label">Input</div>
+          <div class="step-text"><code>camp_003</code> · budget $500</div>
+        </div>
+        <div class="step">
+          <div class="step-label">AI</div>
+          <div class="step-text">Malicious/hallucinated proposal: shift to <strong>$50,500</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Policy</div>
+          <div class="step-text">$50k shift far exceeds limits → <strong>Escalated / blocked</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Executor</div>
+          <div class="step-text">Not invoked — non-Approved status, executor returns without mutating DB.</div>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <div class="step-text">Database unchanged. Money trust boundary holds.</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Status outcomes</h2>
+    <div class="layers">
+      <div class="layer">
+        <div class="layer-title" style="color: var(--green);">Approved</div>
+        <div class="layer-desc">Safe to execute automatically. Snapshot taken, change applied, audit logged.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-title" style="color: var(--red);">Rejected</div>
+        <div class="layer-desc">Blocked — insufficient data, unknown campaign, kill switch, or invalid action.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-title" style="color: var(--amber);">Escalated</div>
+        <div class="layer-desc">Too risky for auto-execution. Queued for human review. No DB change.</div>
+      </div>
+    </div>
+
+    <footer>
+      GrowRev prototype · Mock campaign data · Gemini for proposals · Deterministic policy &amp; reversible execution
+    </footer>
+
+  </div>
+</body>
+</html>

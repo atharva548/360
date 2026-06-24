@@ -1,0 +1,81 @@
+decision node metrics
+
+The decision node in `policy_engine.py` functions as a programmatic checklist. It operates in a completely read-only environment by making a "deep copy" of the campaign data before evaluating anything, ensuring it never accidentally alters the live system during its safety checks.
+
+Here is an elaboration of the exact metrics the file tracks, followed by the step-by-step logic it uses to make a decision.
+
+---
+
+## 1. The Metrics (The Checklist)
+
+The `_evaluate_single` function in `policy_engine.py` relies on two types of data: the current **Campaign State** (what is happening right now) and the **Brand Caps** (the rules set by the business).
+
+* **Emergency Kill Switch (`emergency_kill_switch_active`):** A master switch that completely freezes the system when turned on.
+
+
+* **Campaign Volume Metrics (`conversions` & `impressions`):** The system tracks how many times an ad was seen and how many actions users took, comparing them against `min_conversions_before_acting` and `min_impressions_before_acting`.
+
+
+* **Frequency Metric (`changes_this_week`):** A counter that tracks how many times a campaign has been altered over a rolling 7-day period, compared against `max_changes_per_week`.
+
+
+* **The Budget Shift (`shift`):** Calculated as the absolute difference between what the campaign is spending now and what the AI wants it to spend (`abs(target - current_budget)`). This is measured against `max_daily_budget_shift`.
+
+
+* **The Absolute Cap (`spend_ceiling_per_campaign`):** The maximum dollar amount a daily budget is ever allowed to reach.
+
+
+
+---
+
+## 2. How Decisions Are Taken (The Evaluation Steps)
+
+When `evaluate_proposals` receives a list of ideas, it handles them using sequential, hardcoded rules. If an idea fails any step along the way, the process stops immediately for that proposal and returns a decision.
+
+### Step 1: The Global System Check
+
+Before looking at individual campaigns, the engine checks the global brand rules. If `emergency_kill_switch_active` is true, it skips all further evaluation and stamps **every single proposal** as `REJECTED` with the code `KILL_SWITCH_TRIGGERED`.
+
+### Step 2: The Identity Check
+
+If the system is running normally, it looks at the first proposal and searches for its `campaign_id` in the database. If the system cannot find a campaign with that ID, it stops checking and returns `REJECTED` with an `INVALID_VALUE` code.
+
+### Step 3: The Data Sufficiency Check
+
+The system checks if the campaign has enough data to justify making a change. If the campaign’s total conversions or total impressions are lower than the brand's required minimums, the proposal is `REJECTED` with an `INSUFFICIENT_DATA` code.
+
+### Step 4: The Frequency Check
+
+To stop the AI from making too many chaotic adjustments, the engine looks at the historical log for that campaign. If the number of changes made this week meets or exceeds the `max_changes_per_week` limit, the proposal is `REJECTED` with a `WEEKLY_LIMIT_EXCEEDED` code.
+
+### Step 5: Branching by Action Type
+
+If the proposal survives the first four steps, the engine splits its logic based on what the AI actually wants to do:
+
+#### Path A: If the AI wants to "PAUSE"
+
+* The system checks if the campaign is already paused.
+
+
+* If it is already paused, it returns `REJECTED` (`INVALID_VALUE`).
+
+
+* If it is currently active, it returns `APPROVED`.
+
+
+
+#### Path B: If the AI wants to "SHIFT_BUDGET"
+
+* **Negative Value Check:** The system verifies the new budget target isn't negative. If it is below $0, it returns `REJECTED` (`INVALID_VALUE`).
+
+
+* **The Shift Size Check:** The system calculates the size of the proposed budget change. If the change is greater than the allowed `max_daily_budget_shift`, it flags the proposal as `ESCALATED` with a `BUDGET_SHIFT_BREACH` code so a human can double-check it.
+
+
+* **The Ceiling Check:** The system checks the final proposed budget size. If the target budget is higher than the `spend_ceiling_per_campaign`, it flags the proposal as `ESCALATED` with a `SPEND_CEILING_BREACH` code.
+
+
+
+### Step 6: Final Approval
+
+If a budget shift proposal clears all of these specific numeric boundaries without getting rejected or escalated, the engine safely grants it an `APPROVED` status.

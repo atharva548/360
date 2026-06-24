@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowRev — Data Flow &amp; Decision Pipeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface-2: #243044;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b9cb3;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --amber: #d29922;
+      --purple: #bc8cff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a2332 0%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2rem 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--muted);
+      max-width: 720px;
+      font-size: 0.95rem;
+    }
+
+    .core-rule {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.35);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      max-width: 720px;
+    }
+
+    .core-rule strong { color: var(--red); }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 20, 25, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--border);
+      background: var(--surface);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 4rem;
+    }
+
+    section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    section .subtitle {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .diagram-card .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .legend-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+
+    .legend-card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .legend-card.approved h3 { color: var(--green); }
+    .legend-card.rejected h3 { color: var(--red); }
+    .legend-card.escalated h3 { color: var(--amber); }
+
+    .legend-card ul {
+      list-style: none;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .legend-card li { padding: 0.2rem 0; }
+
+    table.outcomes {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 1.25rem;
+    }
+
+    table.outcomes th,
+    table.outcomes td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+    }
+
+    table.outcomes th {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    table.outcomes td { background: var(--surface); }
+
+    table.outcomes code {
+      background: var(--surface-2);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: var(--purple);
+    }
+
+    .examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .example {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .example h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .example.winner h3 { color: var(--green); }
+    .example.rogue h3 { color: var(--amber); }
+    .example.kill h3 { color: var(--red); }
+
+    .example pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .example .step-approved { color: var(--green); }
+    .example .step-rejected { color: var(--red); }
+    .example .step-escalated { color: var(--amber); }
+    .example .step-blocked { color: var(--red); font-weight: 600; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GrowRev Data Flow &amp; Decision Pipeline</h1>
+    <p>Campaign data moves through four layers: ingestion, LLM proposals, deterministic policy gating, and reversible execution. Every branch below maps to <code>policy_engine.py</code>.</p>
+    <div class="core-rule">
+      <strong>Core rule:</strong> The LLM never touches money. It outputs structured proposals only. All money-moving paths require deterministic policy approval.
+    </div>
+  </header>
+
+  <nav>
+    <a href="#e2e">End-to-End Pipeline</a>
+    <a href="#policy">Policy Decision Node</a>
+    <a href="#outcomes">Branch Outcomes</a>
+    <a href="#demo">Demo Phases</a>
+    <a href="#examples">Example Flows</a>
+    <a href="#reference">Reference Table</a>
+  </nav>
+
+  <main>
+    <!-- 1. End-to-End -->
+    <section id="e2e">
+      <h2>1 — End-to-End Pipeline</h2>
+      <p class="subtitle">Layer 1 ingests metrics; Layer 2 proposes actions; Layer 3 gates every proposal; Layer 4 executes approved actions only.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TB
+    subgraph layer1 ["Layer 1 — Ingestion"]
+        MetaGoogle["Meta / Google Campaign APIs"]
+        MockData["mock_data.py — MOCK_CAMPAIGNS"]
+        Metrics["CampaignMetrics batch"]
+        Caps["BrandCaps"]
+        History["CampaignHistory"]
+        DB[("CampaignState DB")]
+    end
+
+    subgraph layer2 ["Layer 2 — LLM Proposals"]
+        Gemini["GrowRevAgent — Gemini API"]
+        MockLLM["mock_llm.py — offline fallback"]
+        Proposals["ActionProposal array"]
+    end
+
+    subgraph layer3 ["Layer 3 — Policy Decision Node"]
+        PolicyEval["evaluate_proposals()"]
+        Decisions["PolicyDecision array"]
+    end
+
+    subgraph layer4 ["Layer 4 — Executor"]
+        Executor["ReversibleExecutor"]
+        Snapshots[("Pre-action snapshots")]
+        AuditLog[("Audit log")]
+        UpdatedDB[("Updated Campaign DB")]
+    end
+
+    MetaGoogle -.->|"future"| Metrics
+    MockData --> Metrics
+    Metrics --> DB
+    MockData --> Caps
+    MockData --> History
+
+    Metrics --> Gemini
+    Metrics --> MockLLM
+    Caps --> Gemini
+    Caps --> MockLLM
+    Gemini --> Proposals
+    MockLLM --> Proposals
+
+    Proposals --> PolicyEval
+    Caps --> PolicyEval
+    DB --> PolicyEval
+    History --> PolicyEval
+    PolicyEval --> Decisions
+
+    Decisions --> Executor
+    Metrics --> Executor
+    Executor --> Snapshots
+    Executor --> AuditLog
+    Executor --> UpdatedDB
+    UpdatedDB --> History
+
+    classDef layer1 fill:#1e3a5f,stroke:#58a6ff,color:#e6edf3
+    classDef layer2 fill:#2d1f4e,stroke:#bc8cff,color:#e6edf3
+    classDef layer3 fill:#3d2f14,stroke:#d29922,color:#e6edf3
+    classDef layer4 fill:#1a3d2e,stroke:#3fb950,color:#e6edf3
+    class MetaGoogle,MockData,Metrics,Caps,History,DB layer1
+    class Gemini,MockLLM,Proposals layer2
+    class PolicyEval,Decisions layer3
+    class Executor,Snapshots,AuditLog,UpdatedDB layer4
+        </pre>
+      </div>
+    </section>
+
+    <!-- 2. Policy Decision Node -->
+    <section id="policy">
+      <h2>2 — Policy Decision Node (Full Branching)</h2>
+      <p class="subtitle">Each ActionProposal is evaluated independently. Inputs are deep-copied; the live DB and history are never mutated during evaluation.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TD
+    Start(["ActionProposal received"]) --> KillSwitch{"emergency_kill_switch_active?"}
+
+    KillSwitch -->|"Yes"| RejectKill["REJECTED<br/>KILL_SWITCH_TRIGGERED<br/>All ops suspended"]
+    RejectKill --> EndBlocked(["Blocked — no executor"])
+
+    KillSwitch -->|"No"| KnownCampaign{"campaign_id exists in DB?"}
+
+    KnownCampaign -->|"No"| RejectUnknown["REJECTED<br/>INVALID_VALUE<br/>Unknown campaign"]
+    RejectUnknown --> EndBlocked
+
+    KnownCampaign -->|"Yes"| SufficientData{"conversions ≥ min AND<br/>impressions ≥ min?"}
+
+    SufficientData -->|"No"| RejectData["REJECTED<br/>INSUFFICIENT_DATA"]
+    RejectData --> EndBlocked
+
+    SufficientData -->|"Yes"| WeeklyLimit{"changes_this_week ≥ max_changes_per_week?"}
+
+    WeeklyLimit -->|"Yes"| RejectWeekly["REJECTED<br/>WEEKLY_LIMIT_EXCEEDED"]
+    RejectWeekly --> EndBlocked
+
+    WeeklyLimit -->|"No"| ActionType{"action_type?"}
+
+    ActionType -->|"PAUSE"| AlreadyPaused{"status == PAUSED?"}
+    AlreadyPaused -->|"Yes"| RejectPaused["REJECTED<br/>INVALID_VALUE<br/>Already paused"]
+    RejectPaused --> EndBlocked
+    AlreadyPaused -->|"No"| ApprovePause["APPROVED"]
+    ApprovePause --> EndExecute
+
+    ActionType -->|"SHIFT_BUDGET"| NegativeTarget{"target_value &lt; 0?"}
+    NegativeTarget -->|"Yes"| RejectNegative["REJECTED<br/>INVALID_VALUE"]
+    RejectNegative --> EndBlocked
+
+    NegativeTarget -->|"No"| ShiftCheck{"abs(target − daily_budget)<br/>&gt; max_daily_budget_shift?"}
+    ShiftCheck -->|"Yes"| EscalateShift["ESCALATED<br/>BUDGET_SHIFT_BREACH<br/>Human review required"]
+    EscalateShift --> EndBlocked
+
+    ShiftCheck -->|"No"| CeilingCheck{"target_value &gt; spend_ceiling_per_campaign?"}
+    CeilingCheck -->|"Yes"| EscalateCeiling["ESCALATED<br/>SPEND_CEILING_BREACH<br/>Human review required"]
+    EscalateCeiling --> EndBlocked
+
+    CeilingCheck -->|"No"| ApproveShift["APPROVED"]
+    ApproveShift --> EndExecute
+
+    EndExecute(["Forward to ReversibleExecutor"])
+
+    classDef approved fill:#1a3d2e,stroke:#3fb950,color:#e6edf3
+    classDef rejected fill:#3d1f1f,stroke:#f85149,color:#e6edf3
+    classDef escalated fill:#3d2f14,stroke:#d29922,color:#e6edf3
+    classDef blocked fill:#2d3a4f,stroke:#8b9cb3,color:#e6edf3
+    classDef decision fill:#243044,stroke:#58a6ff,color:#e6edf3
+
+    class ApprovePause,ApproveShift,EndExecute approved
+    class RejectKill,RejectUnknown,RejectData,RejectWeekly,RejectPaused,RejectNegative rejected
+    class EscalateShift,EscalateCeiling escalated
+    class EndBlocked blocked
+    class KillSwitch,KnownCampaign,SufficientData,WeeklyLimit,ActionType,AlreadyPaused,NegativeTarget,ShiftCheck,CeilingCheck decision
+        </pre>
+      </div>
+
+      <div class="legend-grid">
+        <div class="legend-card approved">
+          <h3>Approved paths (2)</h3>
+          <ul>
+            <li>PAUSE — campaign is ACTIVE</li>
+            <li>SHIFT_BUDGET — shift within limits, target under ceiling</li>
+          </ul>
+        </div>
+        <div class="legend-card rejected">
+          <h3>Rejected paths (6)</h3>
+          <ul>
+            <li>KILL_SWITCH_TRIGGERED</li>
+            <li>INVALID_VALUE — unknown campaign, already paused, negative target</li>
+            <li>INSUFFICIENT_DATA</li>
+            <li>WEEKLY_LIMIT_EXCEEDED</li>
+          </ul>
+        </div>
+        <div class="legend-card escalated">
+          <h3>Escalated paths (2)</h3>
+          <ul>
+            <li>BUDGET_SHIFT_BREACH — shift exceeds max_daily_budget_shift</li>
+            <li>SPEND_CEILING_BREACH — target exceeds spend_ceiling_per_campaign</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Branch Outcomes -->
+    <section id="outcomes">
+      <h2>3 — Branch Outcomes: What Happens Next</h2>
+      <p class="subtitle">After policy evaluation, each status follows a distinct downstream path. Only APPROVED reaches the executor.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart LR
+    subgraph policyOutcomes ["PolicyDecision status"]
+        Approved["APPROVED"]
+        Rejected["REJECTED"]
+        Escalated["ESCALATED"]
+    end
+
+    subgraph nextSteps ["Next step"]
+        Snapshot["Deep-copy campaign snapshot"]
+        ApplyChange["Apply PAUSE or SHIFT_BUDGET"]
+        AuditWrite["Write ExecutionResult to audit log"]
+        IncrementHistory["Increment changes_this_week"]
+        LogOnly["Log decision only"]
+        NoMutation["DB unchanged"]
+        HumanQueue["Queued for human review"]
+    end
+
+    Approved --> Snapshot --> ApplyChange --> AuditWrite --> IncrementHistory
+    Rejected --> LogOnly --> NoMutation
+    Escalated --> LogOnly --> HumanQueue --> NoMutation
+
+    classDef approved fill:#1a3d2e,stroke:#3fb950,color:#e6edf3
+    classDef rejected fill:#3d1f1f,stroke:#f85149,color:#e6edf3
+    classDef escalated fill:#3d2f14,stroke:#d29922,color:#e6edf3
+    classDef neutral fill:#243044,stroke:#58a6ff,color:#e6edf3
+
+    class Approved,Snapshot,ApplyChange,AuditWrite,IncrementHistory approved
+    class Rejected,LogOnly rejected
+    class Escalated,HumanQueue escalated
+    class NoMutation neutral
+        </pre>
+      </div>
+    </section>
+
+    <!-- 4. Demo Phases -->
+    <section id="demo">
+      <h2>4 — Demo Pipeline Phases (run_demo.py)</h2>
+      <p class="subtitle">The demo script exercises every branch of the money trust boundary across seven phases.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TD
+    DemoStart(["run_demo.py"]) --> Phase1["Phase 1: Ingest MOCK_CAMPAIGNS"]
+    Phase1 --> Phase1b["Gemini or --mock-llm proposals"]
+    Phase1b --> Phase2["Phase 2: Policy evaluate_proposals()"]
+    Phase2 --> Phase3["Phase 3: Execute APPROVED only"]
+    Phase3 --> Phase4["Phase 4: Rollback proof"]
+    Phase4 --> Phase5["Phase 5: Scenario A — ESCALATED + REJECTED"]
+    Phase5 --> Phase6["Phase 6: Scenario B — Kill switch lockdown"]
+    Phase6 --> Phase7["Phase 7: Adversarial rogue LLM payload"]
+
+    Phase5 --> EscBranch["Out-of-bounds shift → ESCALATED"]
+    Phase5 --> RejBranch["Insufficient-data pause → REJECTED"]
+    Phase6 --> KillBranch["All proposals → REJECTED / KILL_SWITCH"]
+    Phase7 --> AdvBranch["3 forged proposals → all blocked"]
+
+    classDef phase fill:#243044,stroke:#58a6ff,color:#e6edf3
+    classDef scenario fill:#3d2f14,stroke:#d29922,color:#e6edf3
+    class Phase1,Phase1b,Phase2,Phase3,Phase4,Phase5,Phase6,Phase7 phase
+    class EscBranch,RejBranch,KillBranch,AdvBranch scenario
+        </pre>
+      </div>
+    </section>
+
+    <!-- 5. Example Flows -->
+    <section id="examples">
+      <h2>5 — Example Flows</h2>
+      <p class="subtitle">Concrete paths through the pipeline for winner, adversarial, and kill-switch scenarios.</p>
+      <div class="examples">
+        <div class="example winner">
+          <h3>camp_003 — Winner (APPROVED)</h3>
+          <pre>INGEST     camp_003: CPA $18, 228 conv, 120k impr, budget $500
+    |
+    v
+LLM        SHIFT_BUDGET → target $700 (+$200 rationale: low CPA winner)
+    |
+    v
+POLICY     shift $200 ≤ max $500  <span class="step-approved">→  APPROVED</span>
+    |
+    v
+EXECUTOR   snapshot saved  →  daily_budget: $500 → $700  →  audit log entry
+    |
+    v
+ROLLBACK   (optional) restore snapshot  →  daily_budget back to $500</pre>
+        </div>
+        <div class="example rogue">
+          <h3>Adversarial Rogue Proposal (ESCALATED)</h3>
+          <pre>INGEST     camp_003: budget $500
+    |
+    v
+LLM        SHIFT_BUDGET → target $50,500  (rogue / hallucinated)
+    |
+    v
+POLICY     shift $50,000 &gt; max $500  <span class="step-escalated">→  ESCALATED / BUDGET_SHIFT_BREACH</span>
+    |
+    x
+EXECUTOR   <span class="step-blocked">(skipped)</span>  →  DB unchanged</pre>
+        </div>
+        <div class="example kill">
+          <h3>Kill Switch Active (REJECTED)</h3>
+          <pre>INGEST     4 legitimate proposals (2 PAUSE, 2 SHIFT_BUDGET)
+    |
+    v
+POLICY     emergency_kill_switch_active = True
+    |        <span class="step-rejected">→  ALL proposals REJECTED / KILL_SWITCH_TRIGGERED</span>
+    x
+EXECUTOR   <span class="step-blocked">(skipped)</span>  →  all campaigns remain ACTIVE, budgets unchanged</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Reference Table -->
+    <section id="reference">
+      <h2>6 — Branch Outcome Reference</h2>
+      <p class="subtitle">Layer-by-layer data contracts and policy status matrix.</p>
+
+      <table class="outcomes">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Mutates state?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1 — Ingestion</strong></td>
+            <td>Raw platform metrics</td>
+            <td><code>CampaignMetrics[]</code>, <code>BrandCaps</code>, <code>CampaignHistory</code>, <code>CampaignState</code> DB</td>
+            <td>Seeds DB only</td>
+          </tr>
+          <tr>
+            <td><strong>2 — LLM</strong></td>
+            <td>Metrics + caps context</td>
+            <td><code>ActionProposal[]</code></td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><strong>3 — Policy</strong></td>
+            <td>Proposals + caps + DB + history</td>
+            <td><code>PolicyDecision[]</code> with status + violation code</td>
+            <td>No (read-only deep copy)</td>
+          </tr>
+          <tr>
+            <td><strong>4 — Executor</strong></td>
+            <td>Approved decisions + metrics</td>
+            <td><code>ExecutionResult</code>, updated DB, audit log</td>
+            <td>Yes (approved only)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="outcomes" style="margin-top: 1.5rem;">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Violation codes</th>
+            <th>Executor called?</th>
+            <th>DB mutated?</th>
+            <th>Rollback available?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>APPROVED</code></td>
+            <td>—</td>
+            <td>Yes</td>
+            <td>Yes</td>
+            <td>Yes (<code>rollback(action_id)</code>)</td>
+          </tr>
+          <tr>
+            <td><code>REJECTED</code></td>
+            <td><code>KILL_SWITCH_TRIGGERED</code>, <code>INSUFFICIENT_DATA</code>, <code>WEEKLY_LIMIT_EXCEEDED</code>, <code>INVALID_VALUE</code></td>
+            <td>No</td>
+            <td>No</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td><code>ESCALATED</code></td>
+            <td><code>BUDGET_SHIFT_BREACH</code>, <code>SPEND_CEILING_BREACH</code></td>
+            <td>No</td>
+            <td>No</td>
+            <td>N/A</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    Source: <a href="PIPELINE.md">PIPELINE.md</a> · Policy logic: <code>growrev/policy_engine.py</code> · Demo: <code>growrev/run_demo.py</code>
+  </footer>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "dark",
+      themeVariables: {
+        primaryColor: "#243044",
+        primaryTextColor: "#e6edf3",
+        primaryBorderColor: "#58a6ff",
+        lineColor: "#8b9cb3",
+        secondaryColor: "#1a2332",
+        tertiaryColor: "#1a2332",
+        background: "#1a2332",
+        mainBkg: "#243044",
+        nodeBorder: "#58a6ff",
+        clusterBkg: "#1a2332",
+        clusterBorder: "#2d3a4f",
+        titleColor: "#e6edf3",
+        edgeLabelBackground: "#1a2332",
+        fontFamily: "Segoe UI, system-ui, sans-serif"
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: "basis",
+        padding: 16,
+        nodeSpacing: 40,
+        rankSpacing: 55
+      },
+      securityLevel: "loose"
+    });
+  </script>
+</body>
+</html>
